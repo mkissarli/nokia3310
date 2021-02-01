@@ -8,9 +8,9 @@ use sdl2::image::{self, LoadTexture, InitFlag};
 
 use specs::*;
 
-mod keyboard::{ Keyboard, Direction };
+mod keyboard;
 mod sdl_helpers;
-mod component;
+mod components;
 
 const WINDOW_WIDTH: u32 = 84;
 const WINDOW_HEIGHT: u32 = 48;
@@ -35,12 +35,12 @@ fn main() -> Result<(), String> {
     
     let mut world = World::new();
 
-    world.insert(DeltaTime(std::time::Instant::now()));
+    world.insert(components::DeltaTime(std::time::Instant::now()));
 
-    let keyboard: Option<Keyboard> = None;
+    let keyboard: Option<keyboard::Keyboard> = None;
     world.insert(keyboard);
     // SDL setup
-    let (mut canvas, mut event_pump) = match sdl_init("Pong", WINDOW_WIDTH, WINDOW_HEIGHT) {
+    let (mut canvas, mut event_pump) = match sdl_helpers::sdl_init("Pong", WINDOW_WIDTH, WINDOW_HEIGHT) {
         Ok(x) => { x },
         Err(e) => { panic!("There was an error creating event_pump: {:?}", e); }
     };
@@ -58,7 +58,7 @@ fn main() -> Result<(), String> {
         canvas.clear();
 
         // Resize
-        sdl_helpers::sdl_rescale(&mut canvas);
+        sdl_helpers::sdl_rescale(&mut canvas, WINDOW_WIDTH, WINDOW_HEIGHT);
         
         // Update DeltaTime
         {
@@ -83,16 +83,16 @@ fn main() -> Result<(), String> {
 
                 // Directional 
                 Event::KeyDown { keycode: Some(Keycode::Left), repeat: false, .. } => {
-                    keyboard = Some(Keyboard::Move(Direction::Left));
+                    keyboard = Some(keyboard::Keyboard::Move(keyboard::Direction::Left));
                 },
                 Event::KeyDown { keycode: Some(Keycode::Right), repeat: false, .. } => {
-                    keyboard = Some(Keyboard::Move(Direction::Right));
+                    keyboard = Some(keyboard::Keyboard::Move(keyboard::Direction::Right));
                 },
                 Event::KeyDown { keycode: Some(Keycode::Up), repeat: false, .. } => {
-                    keyboard = Some(Keyboard::Move(Direction::Up));
+                    keyboard = Some(keyboard::Keyboard::Move(keyboard::Direction::Up));
                 },
                 Event::KeyDown { keycode: Some(Keycode::Down), repeat: false, .. } => {
-                    keyboard = Some(Keyboard::Move(Direction::Down));
+                    keyboard = Some(keyboard::Keyboard::Move(keyboard::Direction::Down));
                 },
 
                 // Direction button up.
@@ -100,12 +100,12 @@ fn main() -> Result<(), String> {
                 Event::KeyUp { keycode: Some(Keycode::Right), repeat: false, .. } |
                 Event::KeyUp { keycode: Some(Keycode::Up), repeat: false, .. } |
                 Event::KeyUp { keycode: Some(Keycode::Down), repeat: false, .. } => {
-                    keyboard = Some(Keyboard::Stop);
+                    keyboard = Some(keyboard::Keyboard::Stop);
                 },
 
                 // Accelerate
                 Event::KeyDown { keycode: Some(Keycode::Space), repeat: false, .. } => {
-                    keyboard = Some(Keyboard::Accelerate);
+                    keyboard = Some(keyboard::Keyboard::Accelerate);
                 }
                 
                 _ => {}

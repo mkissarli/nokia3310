@@ -1,41 +1,43 @@
+use specs::*;
+
 // FLAGS
 
 #[derive(Component, Default, Debug)]
 #[storage(NullStorage)]
-struct Asteroid; 
+pub struct Asteroid; 
 
 #[derive(Component, Default, Debug)]
 #[storage(NullStorage)]
-struct Player; 
+pub struct Player; 
 
 // Components
 
 #[derive(Component, Debug)]
 #[storage(DenseVecStorage)]
-struct Position {
-    x: f32,
-    y: f32,
+pub struct Position {
+    pub x: f32,
+    pub y: f32,
 }
 
 #[derive(Component, Debug)]
 #[storage(DenseVecStorage)]
-struct Velocity {
-    x: f32,
-    y: f32,
+pub struct Velocity {
+    pub x: f32,
+    pub y: f32,
 }
 
 #[derive(Component, Debug)]
 #[storage(VecStorage)]
-struct Sprite {
+pub struct Sprite {
     // Need some kind of animating/sprite selection.
-    width: f32,
-    height: f32
+    pub width: f32,
+    pub height: f32
 }
 
 #[derive(Component, Debug)]
 #[storage(VecStorage)]
-struct Gravity {
-    force: f32
+pub struct Gravity {
+    pub force: f32
 }
 
 impl Default for Gravity {
@@ -48,16 +50,16 @@ impl Default for Gravity {
 
 #[derive(Component, Debug)]
 #[storage(VecStorage)]
-struct Collider {
+pub struct Collider {
     // Relative from top left of sprite (so negatives would be larger.)
-    relative_position: Position,
-    width: f32,
-    height: f32
+    pub relative_position: Position,
+    pub width: f32,
+    pub height: f32
 }
 
 // Resources
 
-struct DeltaTime(std::time::Instant);
+pub struct DeltaTime(pub std::time::Instant);
 
 impl Default for DeltaTime {
     fn default() -> DeltaTime { DeltaTime(std::time::Instant::now()) }

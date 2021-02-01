@@ -1,5 +1,12 @@
+use sdl2::pixels::Color;
+use sdl2::render::{ Canvas, Texture };
+use sdl2::rect::Rect;
+use sdl2::image::{self, LoadTexture, InitFlag};
+use specs::{ ReadStorage, Join };
 
-fn sdl_init(title: &str, width: u32, height: u32) ->
+use crate::components;
+
+pub fn sdl_init(title: &str, width: u32, height: u32) ->
     Result<(Canvas<sdl2::video::Window>, sdl2::EventPump), String>{
 
         let sdl_context = sdl2::init()?;
@@ -24,12 +31,12 @@ fn sdl_init(title: &str, width: u32, height: u32) ->
         Ok((canvas, sdl_context.event_pump()?))
     }
 
-fn sdl_rescale(canvas: &mut Canvas<sdl2::video::Window>){
+pub fn sdl_rescale(canvas: &mut Canvas<sdl2::video::Window>, window_width:u32, window_height: u32){
     let (window_w, window_h) = canvas.window().size();
 
     // The size width of your original screen, in this case 84x48
-    let sx: f32 = window_w  as f32 / WINDOW_WIDTH as f32;
-    let sy: f32 = window_h as f32 / WINDOW_HEIGHT as f32;
+    let sx: f32 = window_w  as f32 / window_width as f32;
+    let sy: f32 = window_h as f32 / window_height as f32;
 
     // Determin the smallest scale and use that so that is fits inside the window
     let scale: f32 = if sx < sy { sx }  else { sy };
@@ -37,20 +44,20 @@ fn sdl_rescale(canvas: &mut Canvas<sdl2::video::Window>){
     canvas.set_scale(scale, scale);
 
     let viewport: Rect = Rect::new(
-        (((window_w as f32 - (WINDOW_WIDTH as f32 * scale as f32)) / 2.0) / scale) as i32,
-        (((window_h as f32 - (WINDOW_HEIGHT as f32 * scale as f32)) / 2.0) / scale) as i32,
-        WINDOW_WIDTH,
-        WINDOW_HEIGHT);
+        (((window_w as f32 - (window_width as f32 * scale as f32)) / 2.0) / scale) as i32,
+        (((window_h as f32 - (window_height as f32 * scale as f32)) / 2.0) / scale) as i32,
+        window_width,
+        window_height);
 
     canvas.set_viewport(viewport);
 }
 
 
 type RenderType<'a> = (
-        ReadStorage<'a, Position>,
-        ReadStorage<'a, Sprite>);
+        ReadStorage<'a, components::Position>,
+        ReadStorage<'a, components::Sprite>);
 
-fn render(
+pub fn render(
     canvas: &mut Canvas<sdl2::video::Window>,
     texture: &Texture,
     data: RenderType) -> Result<(), String> {
