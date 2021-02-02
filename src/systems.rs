@@ -31,4 +31,21 @@ pub struct PickupCollision;
 
 pub struct UpdatePosition;
 
+impl <'a> System<'a> for UpdatePosition {
+    type SystemData = (
+        ReadStorage<'a, Velocity>,
+        WriteStorage<'a, Position>,
+        Read<'a, DeltaTime>);
+
+    fn run(&mut self, data: Self::SystemData){
+        let (velocity, mut position, time) = data;
+        let delta = time.0;
+
+        for (vel, pos) in (&velocity, &mut position).join() {
+            pos.x = pos.x + vel.x * delta.elapsed().as_secs_f32();
+            pos.y = pos.y + vel.y * delta.elapsed().as_secs_f32();
+        }
+    }
+}
+
 pub struct UpdateAnimation;

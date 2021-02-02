@@ -47,6 +47,7 @@ fn main() -> Result<(), String> {
     
     let mut dispatcher = DispatcherBuilder::new()
         .with(systems::Gravity, "gravity", &[])
+        .with(systems::UpdatePosition, "update_position", &["gravity"])
         //.with(systems::UpdateScore, "update_score", &[])
     //.with(systems::TimeStepManager, "time_step", &[])
         //.with(BallCollision, "ball_collision", &["update_pos"])
