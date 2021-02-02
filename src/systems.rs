@@ -1,5 +1,5 @@
 use crate::components::*;
-use specs::{ Read, System, Join };
+use specs::{ Write, Read, System, Join };
 
 pub struct TimeStepManager;
 
@@ -23,3 +23,17 @@ pub struct PickupCollision;
 pub struct UpdatePosition;
 
 pub struct UpdateAnimation;
+
+// Doesn't work as a dispatch...
+pub struct UpdateScore;
+impl<'a> System<'a> for UpdateScore {
+    type SystemData = (
+        Write<'a, Score>,
+        Read<'a, DeltaTime>);
+
+    fn run(&mut self, data: Self::SystemData){
+        let (mut score, time) = data;
+
+        //score.total_time = score.total_time + time.0.elapsed().as_secs_f32();
+    }
+}

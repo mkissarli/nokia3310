@@ -16,10 +16,13 @@ fn main() -> Result<(), String> {
     
     let mut world = World::new();
 
+    // Insert Resources
     world.insert(components::DeltaTime(std::time::Instant::now()));
-
+    world.insert(components::Score { total_time: 0.0, time: 0.0 });
     let keyboard: Option<keyboard::Keyboard> = None;
     world.insert(keyboard);
+
+    
     // SDL setup
     let (mut canvas, mut event_pump) = match sdl_helpers::sdl_init("Pong", WINDOW_WIDTH, WINDOW_HEIGHT) {
         Ok(x) => { x },
@@ -29,7 +32,8 @@ fn main() -> Result<(), String> {
     let texture_creator = canvas.texture_creator();
    
     let mut dispatcher = DispatcherBuilder::new()
-        //.with(systems::TimeStepManager, "time_step", &[])
+        .with(systems::UpdateScore, "update_score", &[])
+    //.with(systems::TimeStepManager, "time_step", &[])
         //.with(BallCollision, "ball_collision", &["update_pos"])
         .build();
 
@@ -103,17 +107,20 @@ fn main() -> Result<(), String> {
         world.maintain();
         
         // Timestep
-        //let time = world.read_resource::<components::DeltaTime>();
-        if total_time < (60.0 / FPS) {
+        let mut score = world.write_resource::<components::Score>();
+        if score.time < (60.0 / FPS) {
             let time = world.read_resource::<components::DeltaTime>();
-            total_time = total_time + time.0.elapsed().as_secs_f32();
+            score.time = score.time + time.0.elapsed().as_secs_f32();
+            score.total_time = score.total_time + time.0.elapsed().as_secs_f32();
         }
         else {
-            total_time = total_time - (60.0 / FPS);
+            score.time = score.time - (60.0 / FPS);
             // Render Everything
             // render(..)
         }
    }
 
+    println!("Total Time: {}", world.read_resource::<components::Score>().total_time);
+    
     Ok(())
 }
