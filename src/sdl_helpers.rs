@@ -6,7 +6,7 @@ use specs::{ ReadStorage, Join };
 
 use crate::components;
 
-pub fn sdl_init(title: &str, width: u32, height: u32) ->
+pub fn sdl_init(title: &str, width: u32, height: u32, scale: u32) ->
     Result<(Canvas<sdl2::video::Window>, sdl2::EventPump), String>{
 
         let sdl_context = sdl2::init()?;
@@ -14,12 +14,13 @@ pub fn sdl_init(title: &str, width: u32, height: u32) ->
 
         let _image_context = image::init(InitFlag::PNG | InitFlag::JPG)?;
         
-        let window = video_subsystem.window(title, width, height)
+        let mut window = video_subsystem.window(title, width, height)
             .position_centered()
             .resizable()
             .build()
             .expect("could not initialize video subsystem");
 
+        window.set_minimum_size(width * scale, height * scale);
         
         let mut canvas = window.into_canvas().build()
             .expect("could not make a canvas");
@@ -50,7 +51,7 @@ pub fn sdl_rescale(canvas: &mut Canvas<sdl2::video::Window>, window_width:u32, w
         window_height);
 
     canvas.set_viewport(viewport);
-    canvas.present();
+    //canvas.present();
 }
 
 
@@ -64,16 +65,17 @@ pub fn render(
     data: RenderType) -> Result<(), String> {
 
     //canvas.clear();
-        
+    println!("Render"); 
     for (pos, sprite) in (&data.0, &data.1).join() {
         //println!("Blitz at {:?}", Position { x: pos.x, y: pos.y });
         canvas.copy(
-            texture, None,
-            //Rect::new(sprite.initial_position.x as i32 + (sprite.width * sprite.current_frame) as i32,
-            //          sprite.initial_position.y as i32 + (sprite.height * sprite.current_animation) as i32,
-            //          sprite.width as u32,
-            //          sprite.height as u32),
-            Rect::new(pos.x as i32, pos.y as i32, sprite.width as u32, sprite.height as u32));
+            texture,
+            Rect::new(sprite.initial_position.x as i32 + (sprite.width * sprite.current_frame) as i32,
+                      sprite.initial_position.y as i32 + (sprite.height * sprite.current_animation) as i32,
+                      sprite.width as u32,
+                      sprite.height as u32),
+            Rect::new(pos.x as i32, pos.y as i32, sprite.width as u32, sprite.height as u32))?;
+        //canvas.copy(texture, None, None)?;
     }
 
     //println!("Present");

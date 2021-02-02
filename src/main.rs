@@ -12,7 +12,8 @@ mod entity_creator;
 
 const WINDOW_WIDTH: u32 = 84;
 const WINDOW_HEIGHT: u32 = 48;
-const FPS: f32 = 15.0;
+const FPS: f32 = 120.0;
+const INIT_SCALE: u32 = 4;
 
 fn main() -> Result<(), String> {
     
@@ -21,7 +22,7 @@ fn main() -> Result<(), String> {
 
     
     // SDL setup
-    let (mut canvas, mut event_pump) = match sdl_helpers::sdl_init("Pong", WINDOW_WIDTH, WINDOW_HEIGHT) {
+    let (mut canvas, mut event_pump) = match sdl_helpers::sdl_init("Pong", WINDOW_WIDTH, WINDOW_HEIGHT, INIT_SCALE) {
         Ok(x) => { x },
         Err(e) => { panic!("There was an error creating event_pump: {:?}", e); }
     };
@@ -35,13 +36,13 @@ fn main() -> Result<(), String> {
         components::Position { x: 1.0, y: 1.0},
         components::Sprite {
             initial_position: components::Position { x: 0.0, y: 0.0 },
-            animation_frames: vec![2, 2],
+            animation_frames: vec![2],
             time_between_frames: 1.0,
             current_frame: 0,
             current_time: 0.0,
             current_animation: 0,
-            width: 14,
-            height: 16
+            width: 7,
+            height: 8
         });
     
     let mut dispatcher = DispatcherBuilder::new()
@@ -132,6 +133,7 @@ fn main() -> Result<(), String> {
             // render(..)
             sdl_helpers::render(&mut canvas, &spritesheet, world.system_data());
         }
+        //canvas.present();
    }
 
     println!("Total Time: {}", world.read_resource::<components::Score>().total_time);
@@ -151,7 +153,7 @@ fn init_insert(world: &mut World) {
 
     // Insert Resources
     world.insert(components::DeltaTime(std::time::Instant::now()));
-    world.insert(components::Score { total_time: 0.0, time: 0.0 });
+    world.insert(components::Score { total_time: 0.0, time: 60.0 / FPS });
     
     let keyboard: Option<keyboard::Keyboard> = None;
     world.insert(keyboard);
