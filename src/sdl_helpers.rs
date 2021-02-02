@@ -50,6 +50,7 @@ pub fn sdl_rescale(canvas: &mut Canvas<sdl2::video::Window>, window_width:u32, w
         window_height);
 
     canvas.set_viewport(viewport);
+    canvas.present();
 }
 
 
@@ -66,7 +67,13 @@ pub fn render(
         
     for (pos, sprite) in (&data.0, &data.1).join() {
         //println!("Blitz at {:?}", Position { x: pos.x, y: pos.y });
-        canvas.copy(texture, None, Rect::new(pos.x as i32, pos.y as i32, sprite.width as u32, sprite.height as u32));
+        canvas.copy(
+            texture, None,
+            //Rect::new(sprite.initial_position.x as i32 + (sprite.width * sprite.current_frame) as i32,
+            //          sprite.initial_position.y as i32 + (sprite.height * sprite.current_animation) as i32,
+            //          sprite.width as u32,
+            //          sprite.height as u32),
+            Rect::new(pos.x as i32, pos.y as i32, sprite.width as u32, sprite.height as u32));
     }
 
     //println!("Present");

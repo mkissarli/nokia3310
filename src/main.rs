@@ -27,7 +27,7 @@ fn main() -> Result<(), String> {
     };
 
     let texture_creator = canvas.texture_creator();
-    let sprite_sheet = texture_creator.load_texture("assets/spritesheet.png");
+    let spritesheet = texture_creator.load_texture("assets/spritesheet.png")?;
         
 
     entity_creator::create_aeroplane(
@@ -38,8 +38,10 @@ fn main() -> Result<(), String> {
             animation_frames: vec![2, 2],
             time_between_frames: 1.0,
             current_frame: 0,
-            width: 7,
-            height: 8
+            current_time: 0.0,
+            current_animation: 0,
+            width: 14,
+            height: 16
         });
     
     let mut dispatcher = DispatcherBuilder::new()
@@ -128,6 +130,7 @@ fn main() -> Result<(), String> {
             score.time = score.time - (60.0 / FPS);
             // Render Everything
             // render(..)
+            sdl_helpers::render(&mut canvas, &spritesheet, world.system_data());
         }
    }
 

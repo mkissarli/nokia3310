@@ -35,6 +35,8 @@ pub struct Sprite {
     pub animation_frames: Vec<u32>,
     pub time_between_frames: f32,
 
+    pub current_animation: u32,
+    pub current_time: f32,
     pub current_frame: u32,
 
     // Animations are all the same size in this.
