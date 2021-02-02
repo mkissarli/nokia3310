@@ -1,5 +1,6 @@
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
+use sdl2::image::LoadTexture;
 
 use specs::*;
 
@@ -7,6 +8,7 @@ mod keyboard;
 mod sdl_helpers;
 mod components;
 mod systems;
+mod entity_creator;
 
 const WINDOW_WIDTH: u32 = 84;
 const WINDOW_HEIGHT: u32 = 48;
@@ -15,12 +17,7 @@ const FPS: f32 = 15.0;
 fn main() -> Result<(), String> {
     
     let mut world = World::new();
-
-    // Insert Resources
-    world.insert(components::DeltaTime(std::time::Instant::now()));
-    world.insert(components::Score { total_time: 0.0, time: 0.0 });
-    let keyboard: Option<keyboard::Keyboard> = None;
-    world.insert(keyboard);
+    init_insert(&mut world);
 
     
     // SDL setup
@@ -30,9 +27,23 @@ fn main() -> Result<(), String> {
     };
 
     let texture_creator = canvas.texture_creator();
-   
+    let sprite_sheet = texture_creator.load_texture("assets/spritesheet.png");
+        
+
+    entity_creator::create_aeroplane(
+        world.create_entity(),
+        components::Position { x: 1.0, y: 1.0},
+        components::Sprite {
+            initial_position: components::Position { x: 0.0, y: 0.0 },
+            animation_frames: vec![2, 2],
+            time_between_frames: 1.0,
+            current_frame: 0,
+            width: 7,
+            height: 8
+        });
+    
     let mut dispatcher = DispatcherBuilder::new()
-        .with(systems::UpdateScore, "update_score", &[])
+        //.with(systems::UpdateScore, "update_score", &[])
     //.with(systems::TimeStepManager, "time_step", &[])
         //.with(BallCollision, "ball_collision", &["update_pos"])
         .build();
@@ -124,3 +135,22 @@ fn main() -> Result<(), String> {
     
     Ok(())
 }
+
+fn init_insert(world: &mut World) {
+    // Insert
+    world.register::<components::Asteroid>();
+    world.register::<components::Player>();
+    world.register::<components::Position>();
+    world.register::<components::Velocity>();
+    world.register::<components::Sprite>();
+    world.register::<components::Gravity>();
+    world.register::<components::Collider>();
+
+    // Insert Resources
+    world.insert(components::DeltaTime(std::time::Instant::now()));
+    world.insert(components::Score { total_time: 0.0, time: 0.0 });
+    
+    let keyboard: Option<keyboard::Keyboard> = None;
+    world.insert(keyboard);
+}
+

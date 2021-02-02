@@ -29,9 +29,17 @@ pub struct Velocity {
 #[derive(Component, Debug)]
 #[storage(VecStorage)]
 pub struct Sprite {
-    // Need some kind of animating/sprite selection.
-    pub width: f32,
-    pub height: f32
+    // Top left of first animation.
+    pub initial_position: Position,
+    // Number of frames in each animation.
+    pub animation_frames: Vec<u32>,
+    pub time_between_frames: f32,
+
+    pub current_frame: u32,
+
+    // Animations are all the same size in this.
+    pub width: u32,
+    pub height: u32
 }
 
 #[derive(Component, Debug)]
