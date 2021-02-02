@@ -65,7 +65,6 @@ pub fn render(
     data: RenderType) -> Result<(), String> {
 
     //canvas.clear();
-    println!("Render"); 
     for (pos, sprite) in (&data.0, &data.1).join() {
         //println!("Blitz at {:?}", Position { x: pos.x, y: pos.y });
         canvas.copy(

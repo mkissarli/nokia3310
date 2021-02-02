@@ -46,14 +46,14 @@ pub struct Sprite {
 
 #[derive(Component, Debug)]
 #[storage(VecStorage)]
-pub struct Gravity {
+pub struct GravityAffected {
     pub force: f32
 }
 
-impl Default for Gravity {
-    fn default() -> Gravity {
-        Gravity {
-            force: 9.8
+impl Default for GravityAffected {
+    fn default() -> GravityAffected {
+        GravityAffected {
+            force: -9.8
         }
     }
 }

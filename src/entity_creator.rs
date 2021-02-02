@@ -9,7 +9,7 @@ pub fn create_aeroplane(
     builder
         .with(pos)
         .with(Velocity { x: 0.0, y: 0.0 })
-        .with(Gravity { force: 9.8 })
+        .with(GravityAffected { force: -9.8 })
         .with(sprite)
         .with(Player)
         .build();

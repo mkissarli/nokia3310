@@ -46,6 +46,7 @@ fn main() -> Result<(), String> {
         });
     
     let mut dispatcher = DispatcherBuilder::new()
+        .with(systems::Gravity, "gravity", &[])
         //.with(systems::UpdateScore, "update_score", &[])
     //.with(systems::TimeStepManager, "time_step", &[])
         //.with(BallCollision, "ball_collision", &["update_pos"])
@@ -148,7 +149,7 @@ fn init_insert(world: &mut World) {
     world.register::<components::Position>();
     world.register::<components::Velocity>();
     world.register::<components::Sprite>();
-    world.register::<components::Gravity>();
+    world.register::<components::GravityAffected>();
     world.register::<components::Collider>();
 
     // Insert Resources
