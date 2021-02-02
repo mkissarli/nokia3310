@@ -1,35 +1,16 @@
-use sdl2::pixels::Color;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
-use std::time::Duration;
-use sdl2::render::{ Canvas, Texture };
-use sdl2::rect::Rect;
-use sdl2::image::{self, LoadTexture, InitFlag};
 
 use specs::*;
 
 mod keyboard;
 mod sdl_helpers;
 mod components;
+mod systems;
 
 const WINDOW_WIDTH: u32 = 84;
 const WINDOW_HEIGHT: u32 = 48;
-
-/*
-struct HelloWorld;
-
-impl<'a> System<'a> for HelloWorld {
-    type SystemData = ReadStorage<'a, Position>;
-
-    fn run(&mut self, position: Self::SystemData) {
-        //use specs::Join;
-
-        for position in position.join() {
-            println!("Hello, {:?}", &position);
-        }
-    }
-}
- */
+const FPS: f32 = 15.0;
 
 fn main() -> Result<(), String> {
     
@@ -48,9 +29,12 @@ fn main() -> Result<(), String> {
     let texture_creator = canvas.texture_creator();
    
     let mut dispatcher = DispatcherBuilder::new()
+        //.with(systems::TimeStepManager, "time_step", &[])
         //.with(BallCollision, "ball_collision", &["update_pos"])
         .build();
 
+
+    let mut total_time: f32 = 0.0;
     
     // Game Loop
     'main: loop {
@@ -60,11 +44,12 @@ fn main() -> Result<(), String> {
         // Resize
         sdl_helpers::sdl_rescale(&mut canvas, WINDOW_WIDTH, WINDOW_HEIGHT);
         
-        // Update DeltaTime
+        // Update DeltaTime        
         {
             let mut delta = world.write_resource::<components::DeltaTime>();
             *delta = components::DeltaTime(std::time::Instant::now());
         }
+        
 
         let mut keyboard = None;
         
@@ -117,8 +102,17 @@ fn main() -> Result<(), String> {
         // Clean up.
         world.maintain();
         
-        // Render Everything.
-        // render(&mut canvas, &paddle_texture, world.system_data());
+        // Timestep
+        //let time = world.read_resource::<components::DeltaTime>();
+        if total_time < (60.0 / FPS) {
+            let time = world.read_resource::<components::DeltaTime>();
+            total_time = total_time + time.0.elapsed().as_secs_f32();
+        }
+        else {
+            total_time = total_time - (60.0 / FPS);
+            // Render Everything
+            // render(..)
+        }
    }
 
     Ok(())

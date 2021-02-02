@@ -1,7 +1,7 @@
 use sdl2::pixels::Color;
 use sdl2::render::{ Canvas, Texture };
 use sdl2::rect::Rect;
-use sdl2::image::{self, LoadTexture, InitFlag};
+use sdl2::image::{self, InitFlag };//LoadTexture, InitFlag};
 use specs::{ ReadStorage, Join };
 
 use crate::components;
