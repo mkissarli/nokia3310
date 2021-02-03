@@ -51,7 +51,8 @@ fn main() -> Result<(), String> {
     let mut dispatcher = DispatcherBuilder::new()
         .with(systems::Gravity, "gravity", &[])
         .with(systems::PlayerMovement, "player_movement", &[])
-        .with(systems::UpdatePosition, "update_position", &["player_movement", "gravity"])
+        .with(systems::PlayerUseFuel, "player_use_fuel", &[])
+        .with(systems::UpdatePosition, "update_position", &["player_movement", "gravity", "player_use_fuel"])
     //.with(systems::UpdateScore, "update_score", &[])
     //.with(systems::TimeStepManager, "time_step", &[])
         //.with(BallCollision, "ball_collision", &["update_pos"])
@@ -98,7 +99,7 @@ fn main() -> Result<(), String> {
                     keyboard = Some(keyboard::Keyboard::Move(keyboard::Direction::Right));
                 },
                 Event::KeyDown { keycode: Some(Keycode::Up), repeat: false, .. } => {
-                    keyboard = Some(keyboard::Keyboard::Move(keyboard::Direction::Up));
+                    keyboard = Some(keyboard::Keyboard::Accelerate);
                 },
                 Event::KeyDown { keycode: Some(Keycode::Down), repeat: false, .. } => {
                     keyboard = Some(keyboard::Keyboard::Move(keyboard::Direction::Down));
