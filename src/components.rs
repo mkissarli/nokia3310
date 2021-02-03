@@ -10,6 +10,10 @@ pub struct Asteroid;
 #[storage(NullStorage)]
 pub struct Player; 
 
+#[derive(Component, Default, Debug)]
+#[storage(NullStorage)]
+pub struct AsteroidSpawner;
+
 // Components
 
 #[derive(Component, Debug)]

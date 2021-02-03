@@ -92,6 +92,9 @@ impl <'a> System<'a> for PlayerUseFuel {
 pub struct AsteroidCollision;
 pub struct PickupCollision;
 
+pub struct AsteroidBoundaryCheck;
+pub struct AsteroidSpawner;
+
 pub struct UpdatePosition;
 
 impl <'a> System<'a> for UpdatePosition {
