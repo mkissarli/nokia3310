@@ -107,6 +107,34 @@ impl <'a> System<'a> for PlayerUseFuel {
 // If each asteroid/pickup does the collision against the player, then we have
 // fewer checks? 
 pub struct AsteroidCollision;
+
+impl <'a> System<'a> for AsteroidCollision {
+    type SystemData = (
+        ReadStorage<'a, Player>,
+        ReadStorage<'a, Asteroid>,
+        ReadStorage<'a, Position>,
+        ReadStorage<'a, Sprite>,
+        ReadStorage<'a, Collider>,
+        Write<'a, GameOver>);
+
+    fn run(&mut self, data: Self::SystemData){
+        let (players, asteroids, positions, sprites, colliders, mut game_over) = data;
+
+        // Could probs optimise this out?
+        for (_p, p_pos, p_sprite, p_collider) in (&players, &positions, &sprites, &colliders).join(){
+            for (_a, a_pos, a_sprite, a_collider) in (&asteroids, &positions, &sprites, &colliders).join(){
+                if p_pos.x < a_pos.x + a_collider.relative_position.x + a_collider.width &&
+                    p_pos.x + p_collider.relative_position.x + p_collider.width > a_pos.x &&
+                    p_pos.y < a_pos.y + a_collider.relative_position.y + a_collider.height &&
+                    p_pos.y + p_collider.relative_position.y + p_collider.height > a_pos.y {
+                        game_over.0 = true;
+                        println!("And you died, by an asteroid collision.");
+                    }
+            }
+        }
+    }
+}
+
 pub struct PickupCollision;
 
 pub struct AsteroidBoundaryCheck;

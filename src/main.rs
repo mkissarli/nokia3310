@@ -46,6 +46,11 @@ fn main() -> Result<(), String> {
             current_animation: 0,
             width: 7,
             height: 8
+        },
+        components::Collider {
+            relative_position: components::Position { x: 0.0, y: 0.0 },
+            width: 7.0,
+            height: 8.0
         });
     
     let mut dispatcher = DispatcherBuilder::new()
@@ -56,6 +61,7 @@ fn main() -> Result<(), String> {
         .with(systems::BoundaryCheck, "boundary_check", &["update_position"])
         .with(systems::GameOverCheck, "game_over_check", &[])
         .with(systems::AsteroidSpawner, "asteroid_spawner", &[])
+        .with(systems::AsteroidCollision, "asteroid_collision", &[])
         .build();
 
 

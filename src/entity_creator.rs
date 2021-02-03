@@ -4,7 +4,8 @@ use crate::components::*;
 pub fn create_aeroplane(
     builder: specs::world::EntityBuilder,
     pos: Position,
-    sprite: Sprite){
+    sprite: Sprite,
+    col: Collider){
 
     builder
         .with(pos)
@@ -17,6 +18,7 @@ pub fn create_aeroplane(
             amount_left: 100.0,
         })
         .with(Player)
+        .with(col)
         .build();
 }
 
@@ -37,6 +39,11 @@ pub fn create_asteroid(
             time_between_frames: 1.0,
             width: 7,
             height: 8
+        })
+        .with(Collider {
+            relative_position: Position { x: 1.0, y: 1.0},
+            width: 5.0,
+            height: 6.0
         })
         .with(GravityAffected { force: -9.8 })
         .with(Asteroid)
