@@ -119,10 +119,11 @@ impl<'a> System <'a> for BoundaryCheck {
     type SystemData = (
         ReadStorage<'a, Player>,
         ReadStorage<'a, Sprite>,
-        WriteStorage<'a, Position>);
+        WriteStorage<'a, Position>,
+        Write<'a, GameOver>);
 
     fn run(&mut self, data: Self::SystemData){
-        let (players, sprites, mut positions) = data;
+        let (players, sprites, mut positions, mut game_over) = data;
 
         for (_p, sprite, pos) in (&players, &sprites, &mut positions).join(){
             if pos.x < 0.0 {
@@ -135,6 +136,21 @@ impl<'a> System <'a> for BoundaryCheck {
             if pos.y < 0.0 {
                 pos.y = 0.0;
             }
+            else if pos.y > WINDOW_HEIGHT as f32 - sprite.height as f32 {
+                game_over.0 = true;
+            }
+        }
+    }
+}
+
+pub struct GameOverCheck;
+
+impl<'a> System<'a> for GameOverCheck {
+    type SystemData = Read<'a, GameOver>;
+
+    fn run(&mut self, game_over: Self::SystemData){
+        if game_over.0 == true {
+            println!("GameOver");
         }
     }
 }

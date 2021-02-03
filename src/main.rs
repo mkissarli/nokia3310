@@ -54,9 +54,7 @@ fn main() -> Result<(), String> {
         .with(systems::PlayerUseFuel, "player_use_fuel", &[])
         .with(systems::UpdatePosition, "update_position", &["player_movement", "gravity", "player_use_fuel"])
         .with(systems::BoundaryCheck, "boundary_check", &["update_position"])
-    //.with(systems::UpdateScore, "update_score", &[])
-    //.with(systems::TimeStepManager, "time_step", &[])
-        //.with(BallCollision, "ball_collision", &["update_pos"])
+        .with(systems::GameOverCheck, "game_over_check", &[])
         .build();
 
 
@@ -162,6 +160,7 @@ fn init_insert(world: &mut World) {
     // Insert Resources
     world.insert(components::DeltaTime(std::time::Instant::now()));
     world.insert(components::Score { total_time: 0.0, time: 60.0 / FPS });
+    world.insert(components::GameOver(false));
     
     let keyboard: Option<keyboard::Keyboard> = None;
     world.insert(keyboard);

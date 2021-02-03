@@ -97,3 +97,9 @@ pub struct Accelerating(pub bool);
 impl Default for Accelerating {
     fn default() -> Accelerating { Accelerating(false) }
 }
+
+pub struct GameOver(pub bool);
+
+impl Default for GameOver {
+    fn default() -> GameOver { GameOver(false) }
+}
