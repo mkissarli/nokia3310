@@ -1,5 +1,6 @@
 use crate::components::*;
 use crate::keyboard;
+use crate::{ WINDOW_WIDTH, WINDOW_HEIGHT };
 
 use specs::{ Write, Read, WriteStorage, ReadStorage, System, Join };
 
@@ -111,3 +112,29 @@ impl <'a> System<'a> for UpdatePosition {
 }
 
 pub struct UpdateAnimation;
+
+pub struct BoundaryCheck;
+
+impl<'a> System <'a> for BoundaryCheck {
+    type SystemData = (
+        ReadStorage<'a, Player>,
+        ReadStorage<'a, Sprite>,
+        WriteStorage<'a, Position>);
+
+    fn run(&mut self, data: Self::SystemData){
+        let (players, sprites, mut positions) = data;
+
+        for (_p, sprite, pos) in (&players, &sprites, &mut positions).join(){
+            if pos.x < 0.0 {
+                pos.x = 0.0;
+            }
+            else if pos.x > (WINDOW_WIDTH as f32 - sprite.width as f32) {
+                pos.x = WINDOW_WIDTH as f32 - sprite.width as f32;
+            }
+
+            if pos.y < 0.0 {
+                pos.y = 0.0;
+            }
+        }
+    }
+}

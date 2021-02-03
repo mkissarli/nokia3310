@@ -53,6 +53,7 @@ fn main() -> Result<(), String> {
         .with(systems::PlayerMovement, "player_movement", &[])
         .with(systems::PlayerUseFuel, "player_use_fuel", &[])
         .with(systems::UpdatePosition, "update_position", &["player_movement", "gravity", "player_use_fuel"])
+        .with(systems::BoundaryCheck, "boundary_check", &["update_position"])
     //.with(systems::UpdateScore, "update_score", &[])
     //.with(systems::TimeStepManager, "time_step", &[])
         //.with(BallCollision, "ball_collision", &["update_pos"])
