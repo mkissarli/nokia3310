@@ -109,11 +109,11 @@ fn main() -> Result<(), String> {
                 // Direction button up.
                 Event::KeyUp { keycode: Some(Keycode::Left), repeat: false, .. } |
                 Event::KeyUp { keycode: Some(Keycode::Right), repeat: false, .. } |
-                Event::KeyUp { keycode: Some(Keycode::Up), repeat: false, .. } => {
+                Event::KeyUp { keycode: Some(Keycode::Down), repeat: false, .. } => {
                     keyboard = Some(keyboard::Keyboard::Stop);
                 },
 
-                Event::KeyUp { keycode: Some(Keycode::Down), repeat: false, .. } => {
+                Event::KeyUp { keycode: Some(Keycode::Up), repeat: false, .. } => {
                     *world.write_resource() = components::Accelerating(false)
                 }
 
@@ -156,7 +156,8 @@ fn init_insert(world: &mut World) {
     world.register::<components::Sprite>();
     world.register::<components::GravityAffected>();
     world.register::<components::Collider>();
-
+    world.register::<components::FuelManager>();
+    
     // Insert Resources
     world.insert(components::DeltaTime(std::time::Instant::now()));
     world.insert(components::Score { total_time: 0.0, time: 60.0 / FPS });

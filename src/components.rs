@@ -67,6 +67,14 @@ pub struct Collider {
     pub height: f32
 }
 
+#[derive(Component, Debug)]
+#[storage(DenseVecStorage)]
+pub struct FuelManager {
+    pub amount_left: f32,
+    pub upward_force: f32,
+    pub cost_per_second: f32
+}
+
 // Resources
 
 pub struct DeltaTime(pub std::time::Instant);

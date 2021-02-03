@@ -62,18 +62,22 @@ impl <'a> System<'a> for PlayerUseFuel {
     type SystemData = (
         ReadStorage<'a, Player>,
         WriteStorage<'a, Velocity>,
+        WriteStorage<'a, FuelManager>,
         Read<'a, Accelerating>,
         Read<'a, DeltaTime>);
 
     fn run(&mut self, data: Self::SystemData){
-        let (players, mut velocities, acc, time) = data;
+        let (players, mut velocities, mut fuels, acc, time) = data;
         let delta = time.0;
         
-        for (_p, vel) in (&players, &mut velocities).join(){
+        for (_p, vel, fuel) in (&players, &mut velocities, &mut fuels).join(){
             match acc.0 {
                 true => {
                     // Fuel management code here.
-                    vel.y = -FUEL_FORCE;
+                    if fuel.amount_left > 0.0 {
+                        vel.y = -fuel.upward_force;
+                        fuel.amount_left = fuel.amount_left - fuel.cost_per_second * delta.elapsed().as_secs_f32();
+                    }
                 },
                 _ => {}
             }
