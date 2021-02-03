@@ -10,8 +10,8 @@ mod components;
 mod systems;
 mod entity_creator;
 
-const WINDOW_WIDTH: u32 = 84;
-const WINDOW_HEIGHT: u32 = 48;
+const WINDOW_WIDTH: u32 = 48;
+const WINDOW_HEIGHT: u32 = 84;
 const FPS: f32 = 120.0;
 const INIT_SCALE: u32 = 4;
 
