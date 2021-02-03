@@ -55,6 +55,7 @@ fn main() -> Result<(), String> {
         .with(systems::UpdatePosition, "update_position", &["player_movement", "gravity", "player_use_fuel"])
         .with(systems::BoundaryCheck, "boundary_check", &["update_position"])
         .with(systems::GameOverCheck, "game_over_check", &[])
+        .with(systems::AsteroidSpawner, "asteroid_spawner", &[])
         .build();
 
 
@@ -134,10 +135,13 @@ fn main() -> Result<(), String> {
         }
         else {
             score.time = score.time - (60.0 / FPS);
+            let mut spawn = world.write_resource::<components::Spawner>();
+            *spawn = components::Spawner(true);
             // Render Everything
             // render(..)
             sdl_helpers::render(&mut canvas, &spritesheet, world.system_data());
         }
+
         //canvas.present();
    }
 
@@ -161,6 +165,7 @@ fn init_insert(world: &mut World) {
     world.insert(components::DeltaTime(std::time::Instant::now()));
     world.insert(components::Score { total_time: 0.0, time: 60.0 / FPS });
     world.insert(components::GameOver(false));
+    world.insert(components::Spawner(false));
     
     let keyboard: Option<keyboard::Keyboard> = None;
     world.insert(keyboard);

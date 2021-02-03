@@ -107,3 +107,9 @@ pub struct GameOver(pub bool);
 impl Default for GameOver {
     fn default() -> GameOver { GameOver(false) }
 }
+
+pub struct Spawner(pub bool);
+
+impl Default for Spawner {
+    fn default() -> Spawner { Spawner(false) }
+}

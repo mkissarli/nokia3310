@@ -5,7 +5,8 @@ authors = ["Malik"]
 edition = "2018"
 
 [dependencies]
-specs = { version = "0.16.1", features = ["specs-derive"] }
+specs = { version = "0.16.1", features = ["specs-derive"]}
+rand = "*"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies.sdl2]

@@ -1,8 +1,13 @@
 use crate::components::*;
+use crate::entity_creator;
 use crate::keyboard;
 use crate::{ WINDOW_WIDTH, WINDOW_HEIGHT };
 
-use specs::{ Write, Read, WriteStorage, ReadStorage, System, Join };
+use rand::Rng;
+
+    
+use specs::{ Write, Read, WriteStorage, ReadStorage, System, Join, Entities, LazyUpdate };
+use specs::world::EntitiesRes;
 
 pub struct Gravity;
 
@@ -56,6 +61,18 @@ impl <'a> System<'a> for PlayerMovement {
     }
 }
 
+pub struct PlayerShoot;
+
+impl <'a> System<'a> for PlayerShoot {
+    type SystemData = (
+        ReadStorage<'a, Player>
+    );
+
+    fn run(&mut self, data: Self::SystemData){
+        
+    }
+}
+
 const FUEL_FORCE: f32 = 10.0;
 pub struct PlayerUseFuel;
 
@@ -93,8 +110,35 @@ pub struct AsteroidCollision;
 pub struct PickupCollision;
 
 pub struct AsteroidBoundaryCheck;
+
 pub struct AsteroidSpawner;
 
+impl <'a> System<'a> for AsteroidSpawner {
+    type SystemData = (
+        Read<'a, DeltaTime>,
+        Read<'a, Score>,
+        Read<'a, EntitiesRes>,
+        Read<'a, LazyUpdate>,
+        Write<'a, Spawner>);
+
+    fn run(&mut self, data: Self::SystemData){
+        let (time, mut score, d_e, d_l, mut spawner) = data;
+        let delta = time.0;
+        let mut rng = rand::thread_rng();
+
+        println!("Spawner: {}", 2.0 - (score.total_time % 2.0));
+        if 2.0 - (score.total_time % 2.0) < 0.05 && spawner.0 {
+            spawner.0 = false;
+            //for i in [0,1].iter(){
+                entity_creator::create_asteroid(
+                    d_l.create_entity(&d_e),
+                    Position { x: rng.gen_range(0..WINDOW_WIDTH - 7) as f32, y: 0.0 },
+                    Velocity { x: 0.0, y: 0.0 });
+            //}
+        }
+    }
+}
+    
 pub struct UpdatePosition;
 
 impl <'a> System<'a> for UpdatePosition {
