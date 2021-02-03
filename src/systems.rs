@@ -1,4 +1,6 @@
 use crate::components::*;
+use crate::keyboard;
+
 use specs::{ Write, Read, WriteStorage, ReadStorage, System, Join };
 
 pub struct Gravity;
@@ -15,7 +17,6 @@ impl <'a> System<'a> for Gravity {
         
         for (g, vel) in (&gravities, &mut velocities).join() {
             vel.y = vel.y - g.force * delta.elapsed().as_secs_f32();
-            println!("Vel is: {}", vel.y)
         }
     }
 }
@@ -23,6 +24,38 @@ impl <'a> System<'a> for Gravity {
 pub struct AirResistance;
 
 pub struct PlayerMovement;
+
+impl <'a> System<'a> for PlayerMovement {
+    type SystemData = (
+        ReadStorage<'a, Player>,
+        WriteStorage<'a, Velocity>,
+        Read<'a, Option<keyboard::Keyboard>>);
+
+    fn run(&mut self, data: Self::SystemData){
+        let (players, mut velocities, d_keyboard) = data;
+
+        let keyboard = match &*d_keyboard {
+            Some(k) => k,
+            None => return, // no change
+        };
+ 
+        
+        for (_p, vel) in (&players, &mut velocities).join(){
+            match keyboard {
+                keyboard::Keyboard::Move(direction) => {
+                    match direction {
+                        keyboard::Direction::Left => { vel.x = -100.0; },
+                        keyboard::Direction::Right => { vel.x = 100.0; },
+                        _ => { vel.x = 0.0; }
+                    }
+                },
+                _ => { vel.x = 0.0; }
+            }
+        }
+    }
+}
+
+pub struct PlayerUseFuel;
 
 // If each asteroid/pickup does the collision against the player, then we have
 // fewer checks? 

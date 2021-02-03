@@ -29,7 +29,10 @@ fn main() -> Result<(), String> {
 
     let texture_creator = canvas.texture_creator();
     let spritesheet = texture_creator.load_texture("assets/spritesheet.png")?;
-        
+
+    let keyboard: Option<keyboard::Keyboard> = None;
+    world.insert(keyboard);
+ 
 
     entity_creator::create_aeroplane(
         world.create_entity(),
@@ -47,8 +50,9 @@ fn main() -> Result<(), String> {
     
     let mut dispatcher = DispatcherBuilder::new()
         .with(systems::Gravity, "gravity", &[])
-        .with(systems::UpdatePosition, "update_position", &["gravity"])
-        //.with(systems::UpdateScore, "update_score", &[])
+        .with(systems::PlayerMovement, "player_movement", &[])
+        .with(systems::UpdatePosition, "update_position", &["player_movement", "gravity"])
+    //.with(systems::UpdateScore, "update_score", &[])
     //.with(systems::TimeStepManager, "time_step", &[])
         //.with(BallCollision, "ball_collision", &["update_pos"])
         .build();
