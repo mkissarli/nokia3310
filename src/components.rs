@@ -83,3 +83,9 @@ pub struct Score {
 impl Default for Score {
     fn default() -> Score { Score{ total_time: 0.0, time: 0.0 }} 
 }
+
+pub struct Accelerating(pub bool);
+
+impl Default for Accelerating {
+    fn default() -> Accelerating { Accelerating(false) }
+}

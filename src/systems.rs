@@ -55,30 +55,25 @@ impl <'a> System<'a> for PlayerMovement {
     }
 }
 
-const FUEL_FORCE: f32 = 15.0;
+const FUEL_FORCE: f32 = 10.0;
 pub struct PlayerUseFuel;
 
 impl <'a> System<'a> for PlayerUseFuel {
     type SystemData = (
         ReadStorage<'a, Player>,
         WriteStorage<'a, Velocity>,
-        Read<'a, Option<keyboard::Keyboard>>,
+        Read<'a, Accelerating>,
         Read<'a, DeltaTime>);
 
     fn run(&mut self, data: Self::SystemData){
-        let (players, mut velocities, d_keyboard, time) = data;
+        let (players, mut velocities, acc, time) = data;
         let delta = time.0;
         
-        let keyboard = match &*d_keyboard {
-            Some(k) => k,
-            None => return, // no change
-        };
-        
         for (_p, vel) in (&players, &mut velocities).join(){
-            match keyboard {
-                keyboard::Keyboard::Accelerate => {
+            match acc.0 {
+                true => {
                     // Fuel management code here.
-                    vel.y = vel.y - FUEL_FORCE;
+                    vel.y = -FUEL_FORCE;
                 },
                 _ => {}
             }

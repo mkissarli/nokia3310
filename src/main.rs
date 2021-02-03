@@ -32,8 +32,8 @@ fn main() -> Result<(), String> {
 
     let keyboard: Option<keyboard::Keyboard> = None;
     world.insert(keyboard);
- 
-
+    world.insert(components::Accelerating(false));
+    
     entity_creator::create_aeroplane(
         world.create_entity(),
         components::Position { x: 1.0, y: 1.0},
@@ -99,7 +99,8 @@ fn main() -> Result<(), String> {
                     keyboard = Some(keyboard::Keyboard::Move(keyboard::Direction::Right));
                 },
                 Event::KeyDown { keycode: Some(Keycode::Up), repeat: false, .. } => {
-                    keyboard = Some(keyboard::Keyboard::Accelerate);
+                    //keyboard = Some(keyboard::Keyboard::Accelerate);
+                    *world.write_resource() = components::Accelerating(true);
                 },
                 Event::KeyDown { keycode: Some(Keycode::Down), repeat: false, .. } => {
                     keyboard = Some(keyboard::Keyboard::Move(keyboard::Direction::Down));
@@ -108,16 +109,14 @@ fn main() -> Result<(), String> {
                 // Direction button up.
                 Event::KeyUp { keycode: Some(Keycode::Left), repeat: false, .. } |
                 Event::KeyUp { keycode: Some(Keycode::Right), repeat: false, .. } |
-                Event::KeyUp { keycode: Some(Keycode::Up), repeat: false, .. } |
-                Event::KeyUp { keycode: Some(Keycode::Down), repeat: false, .. } => {
+                Event::KeyUp { keycode: Some(Keycode::Up), repeat: false, .. } => {
                     keyboard = Some(keyboard::Keyboard::Stop);
                 },
 
-                // Accelerate
-                Event::KeyDown { keycode: Some(Keycode::Space), repeat: false, .. } => {
-                    keyboard = Some(keyboard::Keyboard::Accelerate);
+                Event::KeyUp { keycode: Some(Keycode::Down), repeat: false, .. } => {
+                    *world.write_resource() = components::Accelerating(false)
                 }
-                
+
                 _ => {}
             }
         }
