@@ -65,11 +65,25 @@ pub struct PlayerShoot;
 
 impl <'a> System<'a> for PlayerShoot {
     type SystemData = (
-        ReadStorage<'a, Player>
-    );
+        ReadStorage<'a, Player>,
+        ReadStorage<'a, Position>,
+        Write<'a, Shooting>,
+        Read<'a, LazyUpdate>,
+        Read<'a, EntitiesRes>,
+        Read<'a, IsShooting>);
 
     fn run(&mut self, data: Self::SystemData){
-        
+        let (players, positions, mut shooting, lazy, d_e, is_shooting) = data;
+        println!("{:?}", shooting.delay);
+        for (player, pos) in (&players, &positions).join(){
+            if shooting.time <= 0.0 && is_shooting.0 {
+                println!("Is shooting.");
+                shooting.time = shooting.delay;
+                entity_creator::create_bullet(
+                    lazy.create_entity(&d_e),
+                    Position { x: pos.x, y: pos.y - 5.0 });
+            }
+        }
     }
 }
 
@@ -154,9 +168,9 @@ impl <'a> System<'a> for AsteroidSpawner {
         let delta = time.0;
         let mut rng = rand::thread_rng();
 
-        println!("Spawner: {}", 2.0 - (score.total_time % 2.0));
-        if 2.0 - (score.total_time % 2.0) < 0.05 && spawner.0 {
-            spawner.0 = false;
+        //println!("Spawner: {}", 2.0 - (score.total_time % 2.0));
+        if spawner.delay - (score.total_time % spawner.delay) < 0.05 && spawner.can_spawn {
+            spawner.can_spawn = false;
             //for i in [0,1].iter(){
                 entity_creator::create_asteroid(
                     d_l.create_entity(&d_e),

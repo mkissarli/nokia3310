@@ -14,6 +14,10 @@ pub struct Player;
 #[storage(NullStorage)]
 pub struct AsteroidSpawner;
 
+#[derive(Component, Default, Debug)]
+#[storage(NullStorage)]
+pub struct Bullet;
+
 // Components
 
 #[derive(Component, Debug)]
@@ -108,8 +112,37 @@ impl Default for GameOver {
     fn default() -> GameOver { GameOver(false) }
 }
 
-pub struct Spawner(pub bool);
+pub struct Spawner{
+    pub can_spawn: bool,
+    pub delay: f32
+}
 
 impl Default for Spawner {
-    fn default() -> Spawner { Spawner(false) }
+    fn default() -> Spawner {
+        Spawner {
+            can_spawn: true,
+            delay: 2.0
+        }
+    }
+}
+
+pub struct IsShooting(pub bool);
+impl Default for IsShooting {
+    fn default() -> IsShooting{ IsShooting(false) }
+}
+
+pub struct Shooting {
+    pub is_shooting: bool,
+    pub delay: f32,
+    pub time: f32
+}
+
+impl Default for Shooting {
+    fn default() -> Shooting {
+        Shooting {
+            is_shooting: true,
+            delay: 4.0,
+            time: 0.0
+        }
+    }
 }

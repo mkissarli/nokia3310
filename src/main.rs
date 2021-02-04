@@ -62,6 +62,7 @@ fn main() -> Result<(), String> {
         .with(systems::GameOverCheck, "game_over_check", &[])
         .with(systems::AsteroidSpawner, "asteroid_spawner", &[])
         .with(systems::AsteroidCollision, "asteroid_collision", &[])
+        .with(systems::PlayerShoot, "player_shoot", &["asteroid_collision"])
         .build();
 
 
@@ -120,34 +121,45 @@ fn main() -> Result<(), String> {
                 },
 
                 Event::KeyUp { keycode: Some(Keycode::Up), repeat: false, .. } => {
-                    *world.write_resource() = components::Accelerating(false)
-                }
+                    *world.write_resource() = components::Accelerating(false);
+                },
 
+                Event::KeyDown { keycode: Some(Keycode::Space), repeat: false, .. } => {
+                    *world.write_resource() = components::IsShooting(true)
+                },
+                Event::KeyUp { keycode: Some(Keycode::Space), repeat: false, .. } => {
+                    *world.write_resource() = components::IsShooting(false)
+                },
+                
                 _ => {}
             }
         }
 
         *world.write_resource() = keyboard;
-
+        
         // Clean up.
         world.maintain();
         
         // Timestep
+        let time = world.read_resource::<components::DeltaTime>();
         let mut score = world.write_resource::<components::Score>();
         if score.time < (60.0 / FPS) {
-            let time = world.read_resource::<components::DeltaTime>();
             score.time = score.time + time.0.elapsed().as_secs_f32();
             score.total_time = score.total_time + time.0.elapsed().as_secs_f32();
         }
         else {
             score.time = score.time - (60.0 / FPS);
             let mut spawn = world.write_resource::<components::Spawner>();
-            *spawn = components::Spawner(true);
+            spawn.can_spawn = true;
             // Render Everything
             // render(..)
             sdl_helpers::render(&mut canvas, &spritesheet, world.system_data());
         }
-
+        //let old_shooting = world.read_resource::<components::Shooting>();
+        let mut shooting = world.write_resource::<components::Shooting>();
+        shooting.time = shooting.time - time.0.elapsed().as_secs_f32();
+        //shooting.can_shoot = old_shooting.can_shoot;
+        //shooting.delay = old_shooting.delay;
         //canvas.present();
    }
 
@@ -166,12 +178,22 @@ fn init_insert(world: &mut World) {
     world.register::<components::GravityAffected>();
     world.register::<components::Collider>();
     world.register::<components::FuelManager>();
+    world.register::<components::Bullet>();
     
     // Insert Resources
     world.insert(components::DeltaTime(std::time::Instant::now()));
     world.insert(components::Score { total_time: 0.0, time: 60.0 / FPS });
     world.insert(components::GameOver(false));
-    world.insert(components::Spawner(false));
+    world.insert(components::Spawner {
+        can_spawn: true,
+        delay: 2.0
+    });
+    world.insert(components::Shooting{
+        is_shooting: true,
+        delay: 60.0 / FPS,
+        time: 0.0
+    });
+    world.insert(components::IsShooting(false));
     
     let keyboard: Option<keyboard::Keyboard> = None;
     world.insert(keyboard);
