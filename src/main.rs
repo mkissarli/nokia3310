@@ -36,7 +36,7 @@ fn main() -> Result<(), String> {
     
     entity_creator::create_aeroplane(
         world.create_entity(),
-        components::Position { x: 1.0, y: 1.0},
+        components::Position { x: 1.0, y: WINDOW_HEIGHT as f32 - 10.0 },
         components::Sprite {
             initial_position: components::Position { x: 0.0, y: 0.0 },
             animation_frames: vec![2],

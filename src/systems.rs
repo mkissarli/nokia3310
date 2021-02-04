@@ -66,21 +66,22 @@ pub struct PlayerShoot;
 impl <'a> System<'a> for PlayerShoot {
     type SystemData = (
         ReadStorage<'a, Player>,
+        ReadStorage<'a, Sprite>,
         ReadStorage<'a, Position>,
         Write<'a, Shooting>,
         Read<'a, LazyUpdate>,
-        Read<'a, EntitiesRes>,
-        Read<'a, IsShooting>);
+        Read<'a, EntitiesRes>);
 
     fn run(&mut self, data: Self::SystemData){
-        let (players, positions, mut shooting, lazy, d_e, is_shooting) = data;
-        for (player, pos) in (&players, &positions).join(){
+        let (players, sprites, positions, mut shooting, lazy, d_e) = data;
+        for (player, sprite, pos) in (&players, &sprites, &positions).join(){
             if shooting.time <= 0.0 && shooting.is_shooting{
                 println!("shoot shoot");
                 shooting.time = shooting.delay;
                 entity_creator::create_bullet(
                     lazy.create_entity(&d_e),
-                    Position { x: pos.x, y: pos.y - 5.0 });
+                    Position { x: pos.x + (sprite.width / 2) as f32, y: pos.y - 5.0 },
+                    Velocity { x: 0.0, y: -15.0 });
             }
         }
     }

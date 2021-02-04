@@ -52,11 +52,12 @@ pub fn create_asteroid(
 
 pub fn create_bullet(
     builder: specs::world::LazyBuilder,
-    pos: Position){
+    pos: Position,
+    vel: Velocity){
     builder
         .with(pos)
         .with(Sprite {
-            initial_position: Position { x: 0.0, y: 17.0 },
+            initial_position: Position { x: 0.0, y: 16.0 },
             animation_frames: vec![1],
             current_animation: 0,
             current_frame: 0,
@@ -65,6 +66,7 @@ pub fn create_bullet(
             width: 1,
             height: 1
         })
+        .with(vel)
         .with(Collider {
             relative_position: Position { x: 0.0, y: 0.0 },
             width: 1.0,
