@@ -76,7 +76,7 @@ impl <'a> System<'a> for PlayerShoot {
         let (players, sprites, positions, mut shooting, lazy, d_e) = data;
         for (player, sprite, pos) in (&players, &sprites, &positions).join(){
             if shooting.time <= 0.0 && shooting.is_shooting{
-                println!("shoot shoot");
+                //println!("shoot shoot");
                 shooting.time = shooting.delay;
                 entity_creator::create_bullet(
                     lazy.create_entity(&d_e),
@@ -143,6 +143,36 @@ impl <'a> System<'a> for AsteroidCollision {
                     p_pos.y + p_collider.relative_position.y + p_collider.height > a_pos.y {
                         game_over.0 = true;
                     }
+            }
+        }
+    }
+}
+
+pub struct BulletCollision;
+
+impl <'a> System<'a> for BulletCollision {
+    type SystemData = (
+        ReadStorage<'a, Asteroid>,
+        ReadStorage<'a, Bullet>,
+        ReadStorage<'a, Position>,
+        ReadStorage<'a, Sprite>,
+        ReadStorage<'a, Collider>,
+        Entities<'a>);
+
+    fn run(&mut self, data: Self::SystemData){
+        let (asteroids, bullets, positions, sprites, colliders, d_e) = data;
+
+        for(_a, a_pos, a_collider, a_e) in (&asteroids, &positions, &colliders, &d_e).join(){
+            for(_b, b_pos, b_collider, b_e) in (&bullets, &positions, &colliders, &d_e).join(){
+                if a_pos.x < b_pos.x + b_collider.relative_position.x + b_collider.width &&
+                    a_pos.x + a_collider.relative_position.x + a_collider.width > b_pos.x &&
+                    a_pos.y < b_pos.y + b_collider.relative_position.y + b_collider.height &&
+                    a_pos.y + a_collider.relative_position.y + a_collider.height > b_pos.y {
+
+                        d_e.delete(a_e);
+                        d_e.delete(b_e);
+                        //println!("Asteroid got hit.");
+                    } 
             }
         }
     }

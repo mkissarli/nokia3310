@@ -63,6 +63,7 @@ fn main() -> Result<(), String> {
         .with(systems::AsteroidSpawner, "asteroid_spawner", &[])
         .with(systems::AsteroidCollision, "asteroid_collision", &[])
         .with(systems::PlayerShoot, "player_shoot", &["asteroid_collision"])
+        .with(systems::BulletCollision, "bullet_collision", &["update_position"])
         .build();
 
 
