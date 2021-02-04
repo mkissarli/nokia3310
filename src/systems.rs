@@ -74,10 +74,9 @@ impl <'a> System<'a> for PlayerShoot {
 
     fn run(&mut self, data: Self::SystemData){
         let (players, positions, mut shooting, lazy, d_e, is_shooting) = data;
-        println!("{:?}", shooting.delay);
         for (player, pos) in (&players, &positions).join(){
-            if shooting.time <= 0.0 && is_shooting.0 {
-                println!("Is shooting.");
+            if shooting.time <= 0.0 && shooting.is_shooting{
+                println!("shoot shoot");
                 shooting.time = shooting.delay;
                 entity_creator::create_bullet(
                     lazy.create_entity(&d_e),
@@ -142,7 +141,6 @@ impl <'a> System<'a> for AsteroidCollision {
                     p_pos.y < a_pos.y + a_collider.relative_position.y + a_collider.height &&
                     p_pos.y + p_collider.relative_position.y + p_collider.height > a_pos.y {
                         game_over.0 = true;
-                        println!("And you died, by an asteroid collision.");
                     }
             }
         }
@@ -239,7 +237,7 @@ impl<'a> System<'a> for GameOverCheck {
 
     fn run(&mut self, game_over: Self::SystemData){
         if game_over.0 == true {
-            println!("GameOver");
+            //println!("GameOver");
         }
     }
 }

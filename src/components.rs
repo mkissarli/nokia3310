@@ -126,11 +126,6 @@ impl Default for Spawner {
     }
 }
 
-pub struct IsShooting(pub bool);
-impl Default for IsShooting {
-    fn default() -> IsShooting{ IsShooting(false) }
-}
-
 pub struct Shooting {
     pub is_shooting: bool,
     pub delay: f32,

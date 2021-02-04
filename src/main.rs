@@ -125,10 +125,12 @@ fn main() -> Result<(), String> {
                 },
 
                 Event::KeyDown { keycode: Some(Keycode::Space), repeat: false, .. } => {
-                    *world.write_resource() = components::IsShooting(true)
+                    let mut shooting = world.write_resource::<components::Shooting>();
+                    shooting.is_shooting = true;
                 },
                 Event::KeyUp { keycode: Some(Keycode::Space), repeat: false, .. } => {
-                    *world.write_resource() = components::IsShooting(false)
+                    let mut shooting = world.write_resource::<components::Shooting>();
+                    shooting.is_shooting = false;
                 },
                 
                 _ => {}
@@ -155,12 +157,8 @@ fn main() -> Result<(), String> {
             // render(..)
             sdl_helpers::render(&mut canvas, &spritesheet, world.system_data());
         }
-        //let old_shooting = world.read_resource::<components::Shooting>();
         let mut shooting = world.write_resource::<components::Shooting>();
         shooting.time = shooting.time - time.0.elapsed().as_secs_f32();
-        //shooting.can_shoot = old_shooting.can_shoot;
-        //shooting.delay = old_shooting.delay;
-        //canvas.present();
    }
 
     println!("Total Time: {}", world.read_resource::<components::Score>().total_time);
@@ -189,11 +187,10 @@ fn init_insert(world: &mut World) {
         delay: 2.0
     });
     world.insert(components::Shooting{
-        is_shooting: true,
+        is_shooting: false,
         delay: 60.0 / FPS,
         time: 0.0
     });
-    world.insert(components::IsShooting(false));
     
     let keyboard: Option<keyboard::Keyboard> = None;
     world.insert(keyboard);
