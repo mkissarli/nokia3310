@@ -107,6 +107,16 @@ impl Default for Accelerating {
     fn default() -> Accelerating { Accelerating(false) }
 }
 
+#[derive(Clone, Copy)]
+pub enum GameState {
+    GamePlay,
+    GameOver
+}
+
+impl Default for GameState {
+    fn default() -> GameState { GameState::GamePlay }
+}
+
 pub struct GameOver(pub bool);
 
 impl Default for GameOver {

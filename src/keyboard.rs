@@ -1,8 +1,9 @@
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum Keyboard {
     Stop,
     Move(Direction),
-    Accelerate
+    Accelerate,
+    Other
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
