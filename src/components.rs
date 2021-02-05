@@ -91,13 +91,14 @@ impl Default for DeltaTime {
     fn default() -> DeltaTime { DeltaTime(std::time::Instant::now()) }
 }
 
-pub struct Score {
+pub struct Score{
+    pub points: f32,
     pub total_time: f32,
     pub time: f32,
 }
 
 impl Default for Score {
-    fn default() -> Score { Score{ total_time: 0.0, time: 0.0 }} 
+    fn default() -> Score { Score{ total_time: 0.0, time: 0.0, points: 0.0 }} 
 }
 
 pub struct Accelerating(pub bool);

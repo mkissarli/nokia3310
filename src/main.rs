@@ -12,7 +12,7 @@ mod entity_creator;
 
 const WINDOW_WIDTH: u32 = 48;
 const WINDOW_HEIGHT: u32 = 84;
-const FPS: f32 = 120.0;
+const FPS: f32 = 240.0;
 const INIT_SCALE: u32 = 4;
 
 fn main() -> Result<(), String> {
@@ -76,20 +76,9 @@ fn main() -> Result<(), String> {
 
         // Resize
         sdl_helpers::sdl_rescale(&mut canvas, WINDOW_WIDTH, WINDOW_HEIGHT);
-        
-        // Update DeltaTime        
-        {
-            let mut delta = world.write_resource::<components::DeltaTime>();
-            *delta = components::DeltaTime(std::time::Instant::now());
-        }
-        
-
-        let mut keyboard = None;
-        
-        // Run our Systems
-        dispatcher.dispatch(&mut world);
-
+       
         // Keyboard
+        // End Game
         for event in event_pump.poll_iter() {
             match event {
 
@@ -98,54 +87,94 @@ fn main() -> Result<(), String> {
                 Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
                     break 'main;
                 },
-
-                // Directional 
-                Event::KeyDown { keycode: Some(Keycode::Left), repeat: false, .. } => {
-                    keyboard = Some(keyboard::Keyboard::Move(keyboard::Direction::Left));
-                },
-                Event::KeyDown { keycode: Some(Keycode::Right), repeat: false, .. } => {
-                    keyboard = Some(keyboard::Keyboard::Move(keyboard::Direction::Right));
-                },
-                Event::KeyDown { keycode: Some(Keycode::Up), repeat: false, .. } => {
-                    //keyboard = Some(keyboard::Keyboard::Accelerate);
-                    *world.write_resource() = components::Accelerating(true);
-                },
-                Event::KeyDown { keycode: Some(Keycode::Down), repeat: false, .. } => {
-                    keyboard = Some(keyboard::Keyboard::Move(keyboard::Direction::Down));
-                },
-
-                // Direction button up.
-                Event::KeyUp { keycode: Some(Keycode::Left), repeat: false, .. } |
-                Event::KeyUp { keycode: Some(Keycode::Right), repeat: false, .. } |
-                Event::KeyUp { keycode: Some(Keycode::Down), repeat: false, .. } => {
-                    keyboard = Some(keyboard::Keyboard::Stop);
-                },
-
-                Event::KeyUp { keycode: Some(Keycode::Up), repeat: false, .. } => {
-                    *world.write_resource() = components::Accelerating(false);
-                },
-
-                Event::KeyDown { keycode: Some(Keycode::Space), repeat: false, .. } => {
-                    let mut shooting = world.write_resource::<components::Shooting>();
-                    shooting.is_shooting = true;
-                },
-                Event::KeyUp { keycode: Some(Keycode::Space), repeat: false, .. } => {
-                    let mut shooting = world.write_resource::<components::Shooting>();
-                    shooting.is_shooting = false;
-                },
-                
                 _ => {}
             }
         }
 
-        *world.write_resource() = keyboard;
+
+        // Main
+        if !world.write_resource::<components::GameOver>().0 {
+            println!("Game on?");
+
+            // Update DeltaTime        
+            {
+                let mut delta = world.write_resource::<components::DeltaTime>();
+                *delta = components::DeltaTime(std::time::Instant::now());
+            }
+            
+            
+            let mut keyboard = None;
+            
+            // Run our Systems
+            dispatcher.dispatch(&mut world);
+            
+            for event in event_pump.poll_iter() {
+                match event {
+                    
+                    // Directional 
+                    Event::KeyDown { keycode: Some(Keycode::Left), repeat: false, .. } => {
+                        keyboard = Some(keyboard::Keyboard::Move(keyboard::Direction::Left));
+                    },
+                    Event::KeyDown { keycode: Some(Keycode::Right), repeat: false, .. } => {
+                        keyboard = Some(keyboard::Keyboard::Move(keyboard::Direction::Right));
+                    },
+                    Event::KeyDown { keycode: Some(Keycode::Up), repeat: false, .. } => {
+                        //keyboard = Some(keyboard::Keyboard::Accelerate);
+                        //*world.write_resource() = components::Accelerating(true);
+                        keyboard = Some(keyboard::Keyboard::Move(keyboard::Direction::Up))
+                    },
+                    Event::KeyDown { keycode: Some(Keycode::Down), repeat: false, .. } => {
+                        keyboard = Some(keyboard::Keyboard::Move(keyboard::Direction::Down));
+                    },
+                    
+                    // Direction button up.
+                    Event::KeyUp { keycode: Some(Keycode::Left), repeat: false, .. } |
+                    Event::KeyUp { keycode: Some(Keycode::Right), repeat: false, .. } |
+                    Event::KeyUp { keycode: Some(Keycode::Down), repeat: false, .. } |
+                    Event::KeyUp { keycode: Some(Keycode::Up), repeat: false, ..} => {
+                        keyboard = Some(keyboard::Keyboard::Stop);
+                    },
+                    
+                    //Event::KeyUp { keycode: Some(Keycode::Up), repeat: false, .. } => {
+                    //    *world.write_resource() = components::Accelerating(false);
+                    //},
+                    
+                    Event::KeyDown { keycode: Some(Keycode::Space), repeat: false, .. } => {
+                        let mut shooting = world.write_resource::<components::Shooting>();
+                        shooting.is_shooting = true;
+                    },
+                    Event::KeyUp { keycode: Some(Keycode::Space), repeat: false, .. } => {
+                        let mut shooting = world.write_resource::<components::Shooting>();
+                        shooting.is_shooting = false;
+                    },
+                
+                    _ => {}
+                }
+            }
+
+            let time = world.read_resource::<components::DeltaTime>();
+            let mut shooting = world.write_resource::<components::Shooting>();
+            shooting.time = shooting.time - time.0.elapsed().as_secs_f32();
+
+            *world.write_resource() = keyboard;
+        }
+
+        // If GameOver
+        else {
+            println!("Game Over.");
+            for event in event_pump.poll_iter() {
+                match event {
+                    _ => {}
+                }
+            }
+        }
         
         // Clean up.
         world.maintain();
         
         // Timestep
-        let time = world.read_resource::<components::DeltaTime>();
         let mut score = world.write_resource::<components::Score>();
+        let time = world.read_resource::<components::DeltaTime>();
         if score.time < (60.0 / FPS) {
             score.time = score.time + time.0.elapsed().as_secs_f32();
             score.total_time = score.total_time + time.0.elapsed().as_secs_f32();
@@ -158,8 +187,6 @@ fn main() -> Result<(), String> {
             // render(..)
             sdl_helpers::render(&mut canvas, &spritesheet, world.system_data());
         }
-        let mut shooting = world.write_resource::<components::Shooting>();
-        shooting.time = shooting.time - time.0.elapsed().as_secs_f32();
    }
 
     println!("Total Time: {}", world.read_resource::<components::Score>().total_time);
@@ -181,7 +208,7 @@ fn init_insert(world: &mut World) {
     
     // Insert Resources
     world.insert(components::DeltaTime(std::time::Instant::now()));
-    world.insert(components::Score { total_time: 0.0, time: 60.0 / FPS });
+    world.insert(components::Score { total_time: 0.0, time: 60.0 / FPS, points: 0.0 });
     world.insert(components::GameOver(false));
     world.insert(components::Spawner {
         can_spawn: true,

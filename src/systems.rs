@@ -52,10 +52,12 @@ impl <'a> System<'a> for PlayerMovement {
                     match direction {
                         keyboard::Direction::Left => { vel.x = -15.0; },
                         keyboard::Direction::Right => { vel.x = 15.0; },
-                        _ => { vel.x = 0.0; }
+                        keyboard::Direction::Up => { vel.y = -15.0; },
+                        keyboard::Direction::Down => { vel.y = 15.0; }
+                        _ => { vel.x = 0.0; vel.y = 0.0 }
                     }
                 },
-                _ => { vel.x = 0.0; }
+                _ => { vel.x = 0.0; vel.y = 0.0; }
             }
         }
     }
@@ -157,10 +159,11 @@ impl <'a> System<'a> for BulletCollision {
         ReadStorage<'a, Position>,
         ReadStorage<'a, Sprite>,
         ReadStorage<'a, Collider>,
-        Entities<'a>);
+        Entities<'a>,
+        Write<'a, Score>);
 
     fn run(&mut self, data: Self::SystemData){
-        let (asteroids, bullets, positions, sprites, colliders, d_e) = data;
+        let (asteroids, bullets, positions, sprites, colliders, d_e, mut score) = data;
 
         for(_a, a_pos, a_collider, a_e) in (&asteroids, &positions, &colliders, &d_e).join(){
             for(_b, b_pos, b_collider, b_e) in (&bullets, &positions, &colliders, &d_e).join(){
@@ -169,6 +172,7 @@ impl <'a> System<'a> for BulletCollision {
                     a_pos.y < b_pos.y + b_collider.relative_position.y + b_collider.height &&
                     a_pos.y + a_collider.relative_position.y + a_collider.height > b_pos.y {
 
+                        score.points = score.points + 10.0;
                         d_e.delete(a_e);
                         d_e.delete(b_e);
                         //println!("Asteroid got hit.");
@@ -255,7 +259,8 @@ impl<'a> System <'a> for BoundaryCheck {
                 pos.y = 0.0;
             }
             else if pos.y > WINDOW_HEIGHT as f32 - sprite.height as f32 {
-                game_over.0 = true;
+                //game_over.0 = true;
+                pos.y = WINDOW_HEIGHT as f32 - sprite.height as f32;
             }
         }
     }
