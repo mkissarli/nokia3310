@@ -1,6 +1,7 @@
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::image::LoadTexture;
+use sdl2::render::{ Canvas, Texture };
 
 use specs::*;
 
@@ -75,17 +76,7 @@ fn main() -> Result<(), String> {
     // Game Loop
     'main: loop {
         // Clean Screen
-        canvas.clear();
-
-        sdl_helpers::render_font(
-            &mut canvas,
-            &fonts,
-            components::Position{x:2.0, y:2.0},
-            components::Position{x:4.0, y:4.0},
-            10,14,18,
-            "@abcz!".to_string(),
-            components::Position {x:0.0, y:10.0});
-        
+        canvas.clear();       
         
         // Resize
         sdl_helpers::sdl_rescale(&mut canvas, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -182,6 +173,12 @@ fn main() -> Result<(), String> {
         }
         else {
             canvas.clear();
+
+            
+            render_text(&mut canvas, &fonts, "Sco".to_string(), components::Position{ x: 2.0, y: 10.0 });
+            render_text(&mut canvas, &fonts, "re:".to_string(), components::Position{ x: 2.0, y: 29.0 });
+            render_text(&mut canvas, &fonts, world.read_resource::<components::Score>().points.to_string(), components::Position{ x: 2.0, y: 48.0});
+            
             canvas.present();
             match keyboard.clone() {
                 Some(k) => {
@@ -206,6 +203,19 @@ fn main() -> Result<(), String> {
     println!("Total Time: {}", world.read_resource::<components::Score>().total_time);
     
     Ok(())
+}
+
+fn render_text(canvas: &mut Canvas<sdl2::video::Window>,
+               fonts: &Texture,
+               s: String, pos: components::Position){
+    sdl_helpers::render_font(
+        canvas,
+        &fonts,
+        components::Position{x:2.0, y:2.0},
+        components::Position{x:4.0, y:4.0},
+        10,14,18,
+        s,
+        pos);
 }
 
 fn init_insert(world: &mut World) {
