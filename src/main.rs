@@ -29,7 +29,8 @@ fn main() -> Result<(), String> {
 
     let texture_creator = canvas.texture_creator();
     let spritesheet = texture_creator.load_texture("assets/spritesheet.png")?;
-
+    let splashscreen = texture_creator.load_texture("assets/splashscreen.png")?;
+        
     let keyboard: Option<keyboard::Keyboard> = None;
     world.insert(keyboard);
    
@@ -48,6 +49,21 @@ fn main() -> Result<(), String> {
 
 
     let mut total_time: f32 = 0.0;
+
+    canvas.clear();
+    canvas.copy(&splashscreen, None, None);
+    canvas.present();
+    // Splash Screen
+    'startup: loop {
+        for event in event_pump.poll_iter() {
+            match event {
+                Event::KeyDown { .. } => {
+                    break 'startup;
+                },
+                _ => { }
+            }
+        }
+    }
     
     // Game Loop
     'main: loop {
