@@ -31,7 +31,7 @@ fn main() -> Result<(), String> {
     let texture_creator = canvas.texture_creator();
     let spritesheet = texture_creator.load_texture("assets/spritesheet.png")?;
     let splashscreen = texture_creator.load_texture("assets/splashscreen.png")?;
-    let fonts = texture_creator.load_texture("assets/real_fonts.png")?;
+    let fonts = texture_creator.load_texture("assets/joshs_font.png")?;
     
     let keyboard: Option<keyboard::Keyboard> = None;
     world.insert(keyboard);
@@ -175,9 +175,8 @@ fn main() -> Result<(), String> {
             canvas.clear();
 
             
-            render_text(&mut canvas, &fonts, "Sco".to_string(), components::Position{ x: 2.0, y: 10.0 });
-            render_text(&mut canvas, &fonts, "re:".to_string(), components::Position{ x: 2.0, y: 29.0 });
-            render_text(&mut canvas, &fonts, world.read_resource::<components::Score>().points.to_string(), components::Position{ x: 2.0, y: 48.0});
+            render_text(&mut canvas, &fonts, "Score:".to_string(), components::Position{ x: 2.0, y: 10.0 });
+            render_text(&mut canvas, &fonts, world.read_resource::<components::Score>().points.to_string(), components::Position{ x: 2.0, y: 20.0});
             
             canvas.present();
             match keyboard.clone() {
@@ -211,9 +210,9 @@ fn render_text(canvas: &mut Canvas<sdl2::video::Window>,
     sdl_helpers::render_font(
         canvas,
         &fonts,
-        components::Position{x:2.0, y:2.0},
-        components::Position{x:4.0, y:4.0},
-        10,14,18,
+        components::Position{x:0.0, y:8.0},
+        components::Position{x:0.0, y:0.0},
+        7,8,32,
         s,
         pos);
 }
