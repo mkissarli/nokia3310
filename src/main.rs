@@ -16,7 +16,7 @@ const FPS: f32 = 240.0;
 const INIT_SCALE: u32 = 4;
 
 fn main() -> Result<(), String> {
-    
+
     let mut world = World::new();
     init_insert(&mut world);
 
@@ -30,7 +30,8 @@ fn main() -> Result<(), String> {
     let texture_creator = canvas.texture_creator();
     let spritesheet = texture_creator.load_texture("assets/spritesheet.png")?;
     let splashscreen = texture_creator.load_texture("assets/splashscreen.png")?;
-        
+    let fonts = texture_creator.load_texture("assets/real_fonts.png")?;
+    
     let keyboard: Option<keyboard::Keyboard> = None;
     world.insert(keyboard);
    
@@ -49,12 +50,16 @@ fn main() -> Result<(), String> {
 
 
     let mut total_time: f32 = 0.0;
-
+   
     canvas.clear();
     canvas.copy(&splashscreen, None, None);
     canvas.present();
+
+
     // Splash Screen
     'startup: loop {
+        sdl_helpers::sdl_rescale(&mut canvas, WINDOW_WIDTH, WINDOW_HEIGHT);
+
         for event in event_pump.poll_iter() {
             match event {
                 Event::KeyDown { .. } => {
@@ -63,6 +68,8 @@ fn main() -> Result<(), String> {
                 _ => { }
             }
         }
+
+        canvas.present();
     }
     
     // Game Loop
@@ -70,6 +77,16 @@ fn main() -> Result<(), String> {
         // Clean Screen
         canvas.clear();
 
+        sdl_helpers::render_font(
+            &mut canvas,
+            &fonts,
+            components::Position{x:2.0, y:2.0},
+            components::Position{x:4.0, y:4.0},
+            10,14,18,
+            "@abcz!".to_string(),
+            components::Position {x:0.0, y:10.0});
+        
+        
         // Resize
         sdl_helpers::sdl_rescale(&mut canvas, WINDOW_WIDTH, WINDOW_HEIGHT);
        

@@ -82,3 +82,44 @@ pub fn render(
 
     Ok(())
 }
+
+pub fn render_font(
+    canvas: &mut Canvas<sdl2::video::Window>,
+    texture: &Texture,
+    initial_position: components::Position,
+    gap: components::Position,
+    width: u32,
+    height: u32,
+    num_per_col: u32,
+    string: String,
+    draw_pos: components::Position){
+
+    let mut index = -1;
+    
+    for character in string.to_string().chars() {
+        index = index + 1;
+
+        let mut letter_rect = Rect::new(0,0,0,0);
+        let display_rect = Rect::new(
+            draw_pos.x as i32 + index as i32 * (width as i32 + 1),
+            draw_pos.y as i32,
+            width,
+            height);
+
+        let char_pos = character as u32 - 32;
+
+        let x_pos: i32 = (char_pos % num_per_col) as i32;
+        let y_pos: i32 = (char_pos / num_per_col) as i32;
+
+        letter_rect = Rect::new(
+            initial_position.x as i32 + x_pos * (width as i32 + gap.x as i32),
+            initial_position.y as i32 + y_pos * (height as i32 + gap.y as i32),
+            width,
+            height);
+        
+        canvas.copy(
+            texture,
+            letter_rect,
+            display_rect);
+    }
+}
