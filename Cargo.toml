@@ -8,6 +8,7 @@ build = "build.rs"
 [dependencies]
 specs = { version = "0.16.1", features = ["specs-derive"]}
 rand = "*"
+emscripten_main_loop = "0.1"
 #sdl2 = "0.34"
 #sdl2 = { git = "https://github.com/Rust-SDL2/rust-sdl2.git" }
 
@@ -15,7 +16,8 @@ rand = "*"
 [dependencies.sdl2]
 version = "0.33"
 default-features = false
-features = ["image"]#"bundled",""gfx", "mixer"]#,"tff", "mixer"]#"static-link"
+#features = ["image", "unsafe_textures"]#"bundled",""gfx", "mixer"]#,"tff", "mixer"]#"static-link"
+features = ["image", "unsafe_textures"]
 
 #[package.metadata.vcpkg]
 #dependencies = ["sdl2", "sdl2-image[libjpeg-turbo,tiff,libwebp]", "sdl2-ttf", "sdl2-gfx", "sdl2-mixer"]
