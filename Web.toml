@@ -16,9 +16,9 @@ link-args = [
   "-s",
   "MAX_WEBGL_VERSION=2",
   "--embed-file",
-  "spritesheet.png",
+  "assets/spritesheet.png",
   "--embed-file",
-  "splashscreen.png",
+  "assets/splashscreen.png",
   "--embed-file",
-  "joshs_font.png",
+  "assets/joshs_font.png",
 ]
