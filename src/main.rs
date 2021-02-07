@@ -16,6 +16,21 @@ const WINDOW_HEIGHT: u32 = 84;
 const FPS: f32 = 240.0;
 const INIT_SCALE: u32 = 4;
 
+fn build_main_dispatcher() -> Dispatcher<'static, 'static> {
+    DispatcherBuilder::new()
+        .with(systems::Gravity, "gravity", &[])
+        .with(systems::PlayerMovement, "player_movement", &[])
+        //.with(systems::PlayerUseFuel, "player_use_fuel", &[])
+        .with(systems::UpdatePosition, "update_position", &["player_movement",])
+        .with(systems::BoundaryCheck, "boundary_check", &["update_position"])
+        //.with(systems::GameOverCheck, "game_over_check", &[])
+        .with(systems::AsteroidSpawner, "asteroid_spawner", &[])
+        .with(systems::AsteroidCollision, "asteroid_collision", &[])
+        .with(systems::PlayerShoot, "player_shoot", &["asteroid_collision"])
+        .with(systems::BulletCollision, "bullet_collision", &["update_position"])
+        .build()
+}
+
 fn main() -> Result<(), String> {
 
     let mut world = World::new();
@@ -36,19 +51,7 @@ fn main() -> Result<(), String> {
     let keyboard: Option<keyboard::Keyboard> = None;
     world.insert(keyboard);
    
-    let mut dispatcher = DispatcherBuilder::new()
-        .with(systems::Gravity, "gravity", &[])
-        .with(systems::PlayerMovement, "player_movement", &[])
-        //.with(systems::PlayerUseFuel, "player_use_fuel", &[])
-        .with(systems::UpdatePosition, "update_position", &["player_movement",])
-        .with(systems::BoundaryCheck, "boundary_check", &["update_position"])
-        //.with(systems::GameOverCheck, "game_over_check", &[])
-        .with(systems::AsteroidSpawner, "asteroid_spawner", &[])
-        .with(systems::AsteroidCollision, "asteroid_collision", &[])
-        .with(systems::PlayerShoot, "player_shoot", &["asteroid_collision"])
-        .with(systems::BulletCollision, "bullet_collision", &["update_position"])
-        .build();
-
+    let mut dispatcher = build_main_dispatcher();
 
     let mut total_time: f32 = 0.0;
    
@@ -56,22 +59,11 @@ fn main() -> Result<(), String> {
     canvas.copy(&splashscreen, None, None);
     canvas.present();
 
-
     // Splash Screen
-    'startup: loop {
-        sdl_helpers::sdl_rescale(&mut canvas, WINDOW_WIDTH, WINDOW_HEIGHT);
+    //'startup: loop {
+    //    sdl_helpers::sdl_rescale(&mut canvas, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-        for event in event_pump.poll_iter() {
-            match event {
-                Event::KeyDown { .. } => {
-                    break 'startup;
-                },
-                _ => { }
-            }
-        }
-
-        canvas.present();
-    }
+    //}
     
     // Game Loop
     'main: loop {
@@ -80,7 +72,24 @@ fn main() -> Result<(), String> {
         
         // Resize
         sdl_helpers::sdl_rescale(&mut canvas, WINDOW_WIDTH, WINDOW_HEIGHT);
-       
+
+        if world.read_resource::<components::Startup>().0{
+            canvas.copy(&splashscreen, None, None);
+            canvas.present();
+            for event in event_pump.poll_iter() {
+                match event {
+                    Event::Quit {..} |
+                    Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
+                        break 'main;
+                    },
+                    Event::KeyDown { .. } => {
+                        let mut s = world.write_resource::<components::Startup>();
+                        *s = components::Startup(false);
+                    },
+                    _ => { continue 'main; }
+                }
+            }
+        }
         // Keyboard
 
         // Main
@@ -247,6 +256,7 @@ fn init_insert(world: &mut World) {
     world.insert(keyboard);
 
     world.insert(components::Accelerating(false));
+    world.insert(components::Startup(true));
     
     entity_creator::create_aeroplane(
         world.create_entity(),

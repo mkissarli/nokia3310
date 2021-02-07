@@ -152,3 +152,9 @@ impl Default for Shooting {
         }
     }
 }
+
+pub struct Startup(pub bool);
+
+impl Default for Startup {
+    fn default() -> Startup { Startup(true) }
+}
